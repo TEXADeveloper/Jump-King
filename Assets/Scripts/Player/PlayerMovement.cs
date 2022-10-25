@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask groundMask;
     [SerializeField] private Transform[] leftPoints;
     [SerializeField] private Transform[] rightPoints;
+    [SerializeField] private Transform[] bottomPoints;
     [SerializeField, Range(0f, 0.5f)] private float rayDistance;
     private bool grounded;
 
@@ -48,7 +49,13 @@ public class PlayerMovement : MonoBehaviour
             move();
     }
 
-    private void checkGround() => grounded = Physics2D.OverlapCircle(groundCheckPoint.position, groundCheckArea, groundMask);
+    private void checkGround()
+    {
+        bool hit = false;
+        foreach (Transform point in bottomPoints)
+            hit = Physics2D.Raycast(point.position, Vector2.down, groundCheckArea, groundMask) || hit;
+        grounded = hit;
+    }
 
     private void checkWalls()
     {
@@ -72,7 +79,6 @@ public class PlayerMovement : MonoBehaviour
         if (forceToApply == maxStrength)
             jumpInput = 0;
 
-        Debug.Log(forceToApply);
         rb.velocity = new Vector2(0, rb.velocity.y);
     }
 
@@ -86,5 +92,16 @@ public class PlayerMovement : MonoBehaviour
     private void move()
     {
         rb.velocity = new Vector2(moveDir * speed, rb.velocity.y);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+
+        foreach (Transform point in leftPoints)
+            Gizmos.DrawLine(point.position, point.position + new Vector3(-rayDistance, 0f, 0f));
+        foreach (Transform point in rightPoints)
+            Gizmos.DrawLine(point.position, point.position + new Vector3(rayDistance, 0f, 0f));
+        foreach (Transform point in bottomPoints)
+            Gizmos.DrawLine(point.position, point.position + new Vector3(0f, -groundCheckArea, 0f));
     }
 }
