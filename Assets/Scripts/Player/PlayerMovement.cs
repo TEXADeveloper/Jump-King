@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("General")]
+    [SerializeField] private Animator anim;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Transform groundCheckPoint;
+    [SerializeField] private SpriteRenderer sr;
     [SerializeField, Range(0f, 0.5f)] private float groundCheckArea;
     [SerializeField] private LayerMask groundMask;
     [SerializeField] private Transform[] leftPoints;
@@ -13,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform[] bottomPoints;
     [SerializeField, Range(0f, 0.5f)] private float rayDistance;
     private bool grounded;
+    private bool inGame;
 
     [Header("Movement")]
     [SerializeField, Range(0f, 10f)] private float speed;
@@ -32,12 +34,24 @@ public class PlayerMovement : MonoBehaviour
 
     public void JumpInput(InputAction.CallbackContext value) => jumpInput = value.ReadValue<float>();
 
+    private void canStart() => inGame = true;
+
+    void Start()
+    {
+        Introduction.StartGame += canStart;
+    }
+
     private void FixedUpdate()
     {
+        if (!inGame)
+            return;
+
         checkGround();
         if (!grounded)
         {
             checkWalls();
+            anim.SetBool("Walking", false);
+            anim.SetBool("Charging", false);
             return;
         }
 
@@ -55,6 +69,7 @@ public class PlayerMovement : MonoBehaviour
         foreach (Transform point in bottomPoints)
             hit = Physics2D.Raycast(point.position, Vector2.down, groundCheckArea, groundMask) || hit;
         grounded = hit;
+        anim.SetBool("InAir", !grounded);
     }
 
     private void checkWalls()
@@ -79,6 +94,9 @@ public class PlayerMovement : MonoBehaviour
         if (forceToApply == maxStrength)
             jumpInput = 0;
 
+        anim.SetBool("Walking", false);
+        anim.SetBool("Charging", true);
+
         rb.velocity = new Vector2(0, rb.velocity.y);
     }
 
@@ -87,10 +105,13 @@ public class PlayerMovement : MonoBehaviour
         charging = false;
         rb.velocity = new Vector2(speed *  moveDir * speedMultiplier, forceToApply);
         forceToApply = 0f;
+        anim.SetBool("Charging", false);
     }
 
     private void move()
     {
+        anim.SetBool("Walking", (moveDir != 0));
+        sr.flipX = moveDir == -1;
         rb.velocity = new Vector2(moveDir * speed, rb.velocity.y);
     }
 
@@ -103,5 +124,10 @@ public class PlayerMovement : MonoBehaviour
             Gizmos.DrawLine(point.position, point.position + new Vector3(rayDistance, 0f, 0f));
         foreach (Transform point in bottomPoints)
             Gizmos.DrawLine(point.position, point.position + new Vector3(0f, -groundCheckArea, 0f));
+    }
+
+    void OnDisable()
+    {
+        Introduction.StartGame -= canStart;
     }
 }

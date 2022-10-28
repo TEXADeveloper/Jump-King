@@ -6,12 +6,14 @@ public static class Dialogues
 
     static Dialogues()
     {
-        lines.Add("Juan1", "Jaja re manco te caiste");
-        lines.Add("Juan2", "Wenas pa, que ases acá, pensé que estabas subiendo");
-        lines.Add("Juan3", "Nose tengo que pensarlas viteh?");
-        lines.Add("Juan4", "Jaja todo con faltar de hortografía");
+        lines.Add("JuanIntro", "Cuenta la leyenda, que en la cima, se encuentra la mujer más bella que el mundo haya visto");
+        lines.Add("Juan1", "¿Qué pasa?, ¿no te dan las piernas para subir?");
+        lines.Add("Juan2", "Che, ¿qué hacés aca?, no estabas subiendo?");
+        lines.Add("Juan3", "Dicen que subir es difícil, pero parece que vos ni querés subir");
+        lines.Add("Juan4", "Ja ja ja, otra vez vos, no sé por qué lo intentas");
+        lines.Add("Juan5", "¿Te das cuenta lo inútil que sos?");
 
 
-        lines.Add("Juana1", "Grasiªs p0r SalBArm3");
+        lines.Add("Juana1", "HOLA");
     }
 }
